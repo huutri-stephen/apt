@@ -1,19 +1,19 @@
-package com.apt_corp.profile.dto.request;
-
-import java.time.LocalDate;
+package com.apt_corp.identity.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
+
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProfileCreationRequest {
     String userid;
     String firstName;
     String lastName;
-    LocalDate dob;
     String city;
+    LocalDate dob;
 }

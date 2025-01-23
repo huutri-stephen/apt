@@ -3,6 +3,10 @@ package com.apt_corp.identity.service;
 import java.util.HashSet;
 import java.util.List;
 
+import com.apt_corp.identity.dto.request.ProfileCreationRequest;
+import com.apt_corp.identity.dto.response.UserProfileResponse;
+import com.apt_corp.identity.mapper.ProfileMapper;
+import com.apt_corp.identity.repository.httpclient.ProfileClient;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +37,9 @@ public class UserService {
     UserRepository userRepository;
     RoleRepository roleRepository;
     UserMapper userMapper;
+    ProfileMapper profileMapper;
     PasswordEncoder passwordEncoder;
+    ProfileClient profileClient;
 
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USER_EXISTED);
@@ -45,6 +51,13 @@ public class UserService {
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
         user.setRoles(roles);
+        user = userRepository.save(user);
+
+        ProfileCreationRequest profileRequest = profileMapper.toProfileCreationRequest(request);
+        profileRequest.setUserid(user.getId());
+
+        UserProfileResponse profileResponse = profileClient.createProfile(profileRequest);
+        log.info("Create profilee: {}", profileResponse);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
